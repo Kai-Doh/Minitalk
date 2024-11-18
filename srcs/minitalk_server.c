@@ -6,7 +6,7 @@
 /*   By: ktiomico <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/18 13:03:40 by ktiomico          #+#    #+#             */
-/*   Updated: 2024/11/18 15:47:01 by ktiomico         ###   ########.fr       */
+/*   Updated: 2024/11/18 16:04:22 by ktiomico         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,6 @@ void	handler(int sig_nb, siginfo_t *info)
 		client = info->si_pid;
 	message[index] |= (sig_nb == SIGUSR1) << (7 - bit);
 	bit++;
-
 	if (bit == 8)
 	{
 		bit = 0;
@@ -49,7 +48,7 @@ void	handler(int sig_nb, siginfo_t *info)
 		{
 			process_message(message, client);
 			index = 0;
-			return;
+			return ;
 		}
 		index++;
 	}

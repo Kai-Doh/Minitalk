@@ -6,7 +6,7 @@
 /*   By: ktiomico <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/18 12:58:54 by ktiomico          #+#    #+#             */
-/*   Updated: 2024/11/18 15:58:04 by ktiomico         ###   ########.fr       */
+/*   Updated: 2024/11/18 16:04:50 by ktiomico         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ int	main(int ac, char **av)
 
 	if (ac != 3)
 	{
-		ft_putstr_fd("\033[1;31mUsage = ./client <PID> \"Message\"\033[0m\n", 1);
+		ft_printf("\033[1;31mUsage = ./client <PID> \"Message\"\033[0m\n");
 		exit(1);
 	}
 	server = ft_atoi(av[1]);
