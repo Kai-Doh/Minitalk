@@ -17,8 +17,8 @@ CFLAGS = -Werror -Wall -Wextra -g -I./include
 RM = rm -rf
 
 # Source Files
-SRCS_SERVER = srcs/minitalk_server.c srcs/minitalk_utils.c
-SRCS_CLIENT = srcs/minitalk_client.c srcs/minitalk_utils.c
+SRCS_SERVER = srcs/minitalk_server.c
+SRCS_CLIENT = srcs/minitalk_client.c
 
 # Library
 LIBFT = libft/libft.a

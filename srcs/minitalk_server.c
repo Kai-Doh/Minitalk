@@ -6,51 +6,51 @@
 /*   By: ktiomico <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/18 13:03:40 by ktiomico          #+#    #+#             */
-/*   Updated: 2024/11/18 16:04:22 by ktiomico         ###   ########.fr       */
+/*   Updated: 2024/12/19 19:10:16 by ktiomico         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minitalk.h"
 
-void	handler(int signum, siginfo_t *info);
+void	handle_signal(int sig, siginfo_t *info, void *context)
+{
+	static char	c;
+	static int	bit_pos;
+	pid_t		sender_pid;
+
+	(void)(context);
+	(void)(info);
+	sender_pid = info->si_pid;
+	c |= (sig == SIGUSR2) << (7 - bit_pos);
+	bit_pos++;
+	if (bit_pos == 8)
+	{
+		if (c == '\0')
+		{
+			write(1, "\n", 1);
+			kill(sender_pid, SIGUSR1);
+		}
+		else
+			write(1, &c, 1);
+		c = 0;
+		bit_pos = 0;
+	}
+}
 
 int	main(void)
 {
+	struct sigaction	s_action;
+
+	ft_memset(&s_action, 0, sizeof(s_action));
 	ft_printf("\033[1;32mSERVER ONLINE\nPID: [%d]\n\033[0m", getpid());
-	mt_signal(SIGUSR1, handler, true);
-	mt_signal(SIGUSR2, handler, true);
+	ft_printf("\033[1;32m-------------------\n\033[0m");
+	s_action.sa_sigaction = handle_signal;
+	s_action.sa_flags = SA_SIGINFO;
+	sigaction(SIGUSR1, &s_action, 0);
+	sigaction(SIGUSR2, &s_action, 0);
 	while (1)
-		pause ();
-	return (0);
-}
-
-void	process_message(char *message, pid_t client)
-{
-	ft_printf("\033[36mClient:\033[0m %s\n", message);
-	mt_kill(client, SIGUSR2);
-}
-
-void	handler(int sig_nb, siginfo_t *info)
-{
-	static char		message[1024];
-	static int		bit = 0;
-	static int		index = 0;
-	static pid_t	client;
-
-	if (info->si_pid)
-		client = info->si_pid;
-	message[index] |= (sig_nb == SIGUSR1) << (7 - bit);
-	bit++;
-	if (bit == 8)
 	{
-		bit = 0;
-		if (message[index] == '\0')
-		{
-			process_message(message, client);
-			index = 0;
-			return ;
-		}
-		index++;
+		pause();
 	}
-	mt_kill(client, SIGUSR1);
+	return (0);
 }

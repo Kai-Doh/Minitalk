@@ -6,39 +6,28 @@
 /*   By: ktiomico <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/18 13:18:19 by ktiomico          #+#    #+#             */
-/*   Updated: 2024/11/18 15:08:48 by ktiomico         ###   ########.fr       */
+/*   Updated: 2024/12/19 18:50:23 by ktiomico         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minitalk.h"
 
-void	mt_kill(pid_t server, int sig_nb)
+char	*append_c(char *start, char c)
 {
-	if (kill(server, sig_nb) < 0)
-	{
-		ft_printf("\033[31mKill failed\033[0m\n");
-		exit(EXIT_FAILURE);
-	}
-}
+	int		i;
+	char	*tmp;
 
-void	mt_signal(int sig_nb, void *handler, bool other_info)
-{
-	struct sigaction	sa;
-
-	ft_memset (&sa, 0, sizeof(sa));
-	if (other_info)
+	tmp = malloc(ft_strlen(start) + 2);
+	if (tmp == NULL)
+		return (NULL);
+	i = 0;
+	while (start[i] != '\0')
 	{
-		sa.sa_flags = SA_SIGINFO;
-		sa.sa_sigaction = handler;
+		tmp[i] = start[i];
+		i++;
 	}
-	else
-		sa.sa_handler = handler;
-	sigemptyset(&sa.sa_mask);
-	sigaddset(&sa.sa_mask, SIGUSR1);
-	sigaddset(&sa.sa_mask, SIGUSR2);
-	if (sigaction(sig_nb, &sa, NULL) < 0)
-	{
-		ft_printf("\033[31mSigaction failed\033[0m\n");
-		exit(1);
-	}
+	tmp[i] = c;
+	tmp[i + 1] = '\0';
+	free(start);
+	return (tmp);
 }
