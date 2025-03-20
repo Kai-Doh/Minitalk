@@ -6,7 +6,7 @@
 /*   By: ktiomico <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/18 13:03:40 by ktiomico          #+#    #+#             */
-/*   Updated: 2025/03/20 15:12:54 by ktiomico         ###   ########.fr       */
+/*   Updated: 2025/03/20 15:46:46 by ktiomico         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,16 +20,16 @@ void	handle_signal(int sig, siginfo_t *info, void *context)
 
 	(void)(context);
 	if (!client_pid)
-		client_pid = info->si_pid; // Store client PID once
+		client_pid = info->si_pid;
 	if (sig == SIGUSR2)
-		c |= 1; // Set the least significant bit
+		c |= 1;
 	if (++bit_pos == 8)
 	{
 		if (c == '\0')
 		{
 			write(1, "\n", 1);
 			kill(client_pid, SIGUSR1);
-			client_pid = 0; // Reset for the next message
+			client_pid = 0;
 		}
 		else
 			write(1, &c, 1);
@@ -37,7 +37,7 @@ void	handle_signal(int sig, siginfo_t *info, void *context)
 		bit_pos = 0;
 	}
 	else
-		c <<= 1; // Shift left for the next bit
+		c <<= 1;
 	usleep(50);
 }
 
