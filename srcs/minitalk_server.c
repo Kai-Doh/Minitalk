@@ -6,7 +6,7 @@
 /*   By: ktiomico <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/18 13:03:40 by ktiomico          #+#    #+#             */
-/*   Updated: 2025/03/20 15:46:46 by ktiomico         ###   ########.fr       */
+/*   Updated: 2025/03/20 23:12:07 by ktiomico         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,9 @@
 
 void	handle_signal(int sig, siginfo_t *info, void *context)
 {
-	static unsigned char	c = 0;
-	static int				bit_pos = 0;
-	static pid_t			client_pid = 0;
+	static unsigned char	c;
+	static int				bit_pos;
+	static pid_t			client_pid;
 
 	(void)(context);
 	if (!client_pid)
