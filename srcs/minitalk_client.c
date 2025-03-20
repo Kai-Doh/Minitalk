@@ -6,55 +6,55 @@
 /*   By: ktiomico <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/18 12:58:54 by ktiomico          #+#    #+#             */
-/*   Updated: 2025/03/20 23:13:39 by ktiomico         ###   ########.fr       */
+/*   Updated: 2025/03/21 00:22:23 by ktiomico         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minitalk.h"
 
-void	received_messaged(int sig)
+volatile sig_atomic_t	g_ack;
+
+void	received_message(int sig)
 {
-	if (sig)
+	if (sig == SIGUSR1)
+		g_ack = 1;
+	else if (sig == SIGUSR2)
 		ft_printf("\033[32m✔ Message sent and received!\033[0m\n");
 }
 
-void	str_to_bin(char *str, int pid)
+void	char_to_bin(char c, int pid)
 {
-	int		i;
-	char	c;
+	int	bit_pos;
 
-	while (*str)
+	bit_pos = 0;
+	while (bit_pos < 8)
 	{
-		i = 8;
-		c = *str++;
-		while (i--)
-		{
-			if (c >> i & 1)
-				kill(pid, SIGUSR2);
-			else
-				kill(pid, SIGUSR1);
-			usleep(600);
-		}
-	}
-	i = 8;
-	while (i--)
-	{
-		kill(pid, SIGUSR1);
-		usleep(200);
+		if ((c & (0b10000000 >> bit_pos)) != 0)
+			kill(pid, SIGUSR1);
+		else
+			kill(pid, SIGUSR2);
+		bit_pos++;
+		while (g_ack == 0)
+			usleep(50);
+		g_ack = 0;
 	}
 }
 
 int	main(int argc, char **argv)
 {
 	int					server_pid;
+	char				*str;
 
-	signal(SIGUSR1, received_messaged);
 	if (argc != 3)
 	{
 		ft_printf("\033[1;31mUsage = ./client <PID> \"Message\"\033[0m\n");
 		return (0);
 	}
-	server_pid = atoi(argv[1]);
-	str_to_bin(argv[2], server_pid);
+	server_pid = ft_atoi(argv[1]);
+	str = argv[2];
+	signal(SIGUSR1, received_message);
+	signal(SIGUSR2, received_message);
+	while (*str)
+		char_to_bin(*str++, server_pid);
 	return (0);
 }

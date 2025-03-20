@@ -6,7 +6,7 @@
 /*   By: ktiomico <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/18 13:03:40 by ktiomico          #+#    #+#             */
-/*   Updated: 2025/03/20 23:12:07 by ktiomico         ###   ########.fr       */
+/*   Updated: 2025/03/21 00:19:01 by ktiomico         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,31 +14,30 @@
 
 void	handle_signal(int sig, siginfo_t *info, void *context)
 {
-	static unsigned char	c;
-	static int				bit_pos;
-	static pid_t			client_pid;
+	static char		c;
+	static int		bit_pos;
+	static pid_t	pid_client;
 
-	(void)(context);
-	if (!client_pid)
-		client_pid = info->si_pid;
-	if (sig == SIGUSR2)
-		c |= 1;
-	if (++bit_pos == 8)
+	(void)context;
+	if (info->si_pid != 0)
+		pid_client = info->si_pid;
+	if (sig == SIGUSR1)
+		c |= (0b10000000 >> bit_pos);
+	else if (sig == SIGUSR2)
+		c &= ~(0b10000000 >> bit_pos);
+	bit_pos++;
+	if (bit_pos == 8)
 	{
+		bit_pos = 0;
 		if (c == '\0')
 		{
 			write(1, "\n", 1);
-			kill(client_pid, SIGUSR1);
-			client_pid = 0;
+			kill(pid_client, SIGUSR2);
+			return ;
 		}
-		else
-			write(1, &c, 1);
-		c = 0;
-		bit_pos = 0;
+		write(1, &c, 1);
 	}
-	else
-		c <<= 1;
-	usleep(50);
+	kill(pid_client, SIGUSR1);
 }
 
 int	main(void)
