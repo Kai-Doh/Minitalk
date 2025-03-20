@@ -6,7 +6,7 @@
 /*   By: ktiomico <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/18 13:03:40 by ktiomico          #+#    #+#             */
-/*   Updated: 2024/12/19 19:10:16 by ktiomico         ###   ########.fr       */
+/*   Updated: 2025/03/20 15:12:54 by ktiomico         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,27 +14,31 @@
 
 void	handle_signal(int sig, siginfo_t *info, void *context)
 {
-	static char	c;
-	static int	bit_pos;
-	pid_t		sender_pid;
+	static unsigned char	c = 0;
+	static int				bit_pos = 0;
+	static pid_t			client_pid = 0;
 
 	(void)(context);
-	(void)(info);
-	sender_pid = info->si_pid;
-	c |= (sig == SIGUSR2) << (7 - bit_pos);
-	bit_pos++;
-	if (bit_pos == 8)
+	if (!client_pid)
+		client_pid = info->si_pid; // Store client PID once
+	if (sig == SIGUSR2)
+		c |= 1; // Set the least significant bit
+	if (++bit_pos == 8)
 	{
 		if (c == '\0')
 		{
 			write(1, "\n", 1);
-			kill(sender_pid, SIGUSR1);
+			kill(client_pid, SIGUSR1);
+			client_pid = 0; // Reset for the next message
 		}
 		else
 			write(1, &c, 1);
 		c = 0;
 		bit_pos = 0;
 	}
+	else
+		c <<= 1; // Shift left for the next bit
+	usleep(50);
 }
 
 int	main(void)
@@ -49,8 +53,6 @@ int	main(void)
 	sigaction(SIGUSR1, &s_action, 0);
 	sigaction(SIGUSR2, &s_action, 0);
 	while (1)
-	{
 		pause();
-	}
 	return (0);
 }

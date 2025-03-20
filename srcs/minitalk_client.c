@@ -6,7 +6,7 @@
 /*   By: ktiomico <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/18 12:58:54 by ktiomico          #+#    #+#             */
-/*   Updated: 2024/12/19 19:09:54 by ktiomico         ###   ########.fr       */
+/*   Updated: 2025/03/20 15:40:08 by ktiomico         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,14 +33,14 @@ void	str_to_bin(char *str, int pid)
 				kill(pid, SIGUSR2);
 			else
 				kill(pid, SIGUSR1);
-			usleep(1000);
+			usleep(600); // Reduced delay
 		}
 	}
 	i = 8;
 	while (i--)
 	{
 		kill(pid, SIGUSR1);
-		usleep(100);
+		usleep(200); // Reduced delay
 	}
 }
 
